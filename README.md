@@ -40,3 +40,7 @@ This plugin adds extremely lightweight recaptcha support for WordPress.
         }
     }
     ```
+    
+## Customisation
+
+You can change the markup on recaptcha fields by copying */plugins/flyn-recaptcha/views/frontend.php* to *$themedir$/plugins/flyn-recaptcha/frontend.php* and modifying accordingly.
