@@ -49,6 +49,9 @@ class FlynRC
     public function get_recaptcha(array $options = [])
     {
         require_once __DIR__.'/vendor/autoload.php';
+
+        $options = $this->get_options($options);
+
         return new \ReCaptcha\ReCaptcha($options['private_key']);
     }
 
