@@ -32,8 +32,9 @@ class FlynRC
         if ( empty($this->options) )
         {
             $default_options = apply_filters('flynrc_get_options', [
-                'public_key' => defined('FLYNRC_PUBLIC_KEY') ? FLYNRC_PUBLIC_KEY : '',
-                'private_key' => defined('FLYNRC_PRIVATE_KEY') ? FLYNRC_PRIVATE_KEY : '',
+                'site_key' => defined('FLYNRC_SITE_KEY') ? FLYNRC_SITE_KEY : '',
+                'secret_key' => defined('FLYNRC_SECRET_KEY') ? FLYNRC_SECRET_KEY : '',
+                'action' => 'default',
             ]);
 
             $this->options = array_merge($default_options, $overrides);
@@ -52,7 +53,7 @@ class FlynRC
 
         $options = $this->get_options($options);
 
-        return new \ReCaptcha\ReCaptcha($options['private_key']);
+        return new \ReCaptcha\ReCaptcha($options['secret_key']);
     }
 
     /**
@@ -60,22 +61,26 @@ class FlynRC
      * CAPTCHA test.
      *
      * @param string $response The value of 'g-recaptcha-response' in the submitted form.
+     * @param string $action v3 API action name
      * @param string $remoteIp The end user's IP address.
      * @return \ReCaptcha\Response Response from the service.
      */
-    public function verify($response, $remoteIp = null)
+    public function verify($response, $action, $remoteIp = null)
     {
-        return $this->get_recaptcha()->verify($response, $remoteIp);
+        return $this->get_recaptcha()
+            ->setExpectedAction($action)
+            ->verify($response, $remoteIp);
     }
 
     /**
      * Renders a ReCaptcha captcha on the page.
      * Uses $themedir/plugins/flynsarmy-recaptcha/frontend.php if available
+     * @param array $overrides
      */
-    public function render()
+    public function render(array $overrides = [])
     {
         $located = locate_template('plugins/flyn-recaptcha/frontend.php');
-        $options = $this->get_options();
+        $options = $this->get_options($overrides);
         $recaptcha = $this->get_recaptcha($options);
 
         if ( $located )

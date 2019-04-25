@@ -8,12 +8,13 @@ This plugin adds extremely lightweight recaptcha support for WordPress.
 * `git clone` to */wp-content/plugins/flyn-recaptcha*
 * `composer install`
 * Activate in your WordPress plugins list
-* Either add `FLYNRC_PUBLIC_KEY` and `FLYNRC_PUBLIC_KEY` definitions to your *wp-config.php*, or alternatively add the following in your themes *functions.php*:
+* Either add `FLYNRC_SITE_KEY` and `FLYNRC_SECRET_KEY` definitions to your *wp-config.php*, or alternatively add the following in your themes *functions.php*:
     ```
     // Override default FlynRecaptcha options
     add_filter('flynrc_get_options', function(array $options) {
-        $options['public_key'] = 'your_public_key';
-        $options['private_key'] = 'your_private_key';
+        $options['site_key'] = 'your_public_key';
+        $options['secret_key'] = 'your_private_key';
+        $options['action'] = 'your_site_action';
     
         return $options;
     });
