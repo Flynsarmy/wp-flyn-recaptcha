@@ -1,7 +1,7 @@
 <?php
 /**
 * @package Flynsarmy Recaptcha
-* @version 1.0.0
+* @version 2.0.0
 *
 * Plugin Name: Flynsarmy Recaptcha
 * Description: Adds recaptcha support to your site
@@ -12,15 +12,18 @@
 
 class FlynRC
 {
-    private static $_instance;
+    public $id = '';
     protected $options = [];
 
-    public static function instance()
+    /**
+     * FlynRC constructor.
+     * @param $id
+     * @param array $options
+     */
+    public function __construct($id, array $options = [])
     {
-        if ( !self::$_instance )
-            self::$_instance = new self;
-
-        return self::$_instance;
+        $this->id = 'g-recaptcha-3-' . $id;
+        $this->options = $this->get_options($options);
     }
 
     /**
@@ -29,7 +32,7 @@ class FlynRC
      */
     public function get_options(array $overrides = [])
     {
-        if ( empty($this->options) )
+        if ( empty($options) )
         {
             $default_options = apply_filters('flynrc_get_options', [
                 'site_key' => defined('FLYNRC_SITE_KEY') ? FLYNRC_SITE_KEY : '',
@@ -37,39 +40,41 @@ class FlynRC
                 'action' => 'default',
             ]);
 
-            $this->options = array_merge($default_options, $overrides);
+            $options = array_merge($default_options, $overrides);
         }
 
-        return $this->options;
+        return $options;
     }
 
     /**
      * @param array $options
      * @return \ReCaptcha\ReCaptcha
      */
-    public function get_recaptcha(array $options = [])
+    public function get_recaptcha()
     {
         require_once __DIR__.'/vendor/autoload.php';
 
-        $options = $this->get_options($options);
+        return new \ReCaptcha\ReCaptcha($this->options['secret_key']);
+    }
 
-        return new \ReCaptcha\ReCaptcha($options['secret_key']);
+    public function reload()
+    {
+        require __DIR__.'/views/script.js.php';
     }
 
     /**
      * Calls the reCAPTCHA siteverify API to verify whether the user passes
      * CAPTCHA test.
      *
-     * @param string $response The value of 'g-recaptcha-response' in the submitted form.
-     * @param string $action v3 API action name
-     * @param string $remoteIp The end user's IP address.
+     * @param array $post     POST data submitted by the form
+     * @param null $remoteIp  The end user's IP address.
      * @return \ReCaptcha\Response Response from the service.
      */
-    public function verify($response, $action, $remoteIp = null)
+    public function verify(array $post, $remoteIp = null)
     {
         return $this->get_recaptcha()
-            ->setExpectedAction($action)
-            ->verify($response, $remoteIp);
+            ->setExpectedAction(@$post['g-recaptcha-3-action'])
+            ->verify(@$post['g-recaptcha-3'], $remoteIp);
     }
 
     /**
@@ -80,8 +85,7 @@ class FlynRC
     public function render(array $overrides = [])
     {
         $located = locate_template('plugins/flyn-recaptcha/frontend.php');
-        $options = $this->get_options($overrides);
-        $recaptcha = $this->get_recaptcha($options);
+        $recaptcha = $this->get_recaptcha();
 
         if ( $located )
             require $located;

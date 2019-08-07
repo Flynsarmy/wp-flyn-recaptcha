@@ -1,4 +1,13 @@
 {
+    "name": "flynsarmy/flyn-recaptcha",
+    "description": "Adds recaptcha support to your site",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "flynsarmy",
+            "email": "flynsarmy@gmail.com"
+        }
+    ],
     "require": {
         "google/recaptcha": "^1.2"
     }
