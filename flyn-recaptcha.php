@@ -1,4 +1,5 @@
 <?php
+
 /**
 * @package Flynsarmy Recaptcha
 * @version 2.0.0
@@ -12,8 +13,8 @@
 
 class FlynRC
 {
-    public $id = '';
-    protected $options = [];
+    public string $id = '';
+    protected array $options = [];
 
     /**
      * FlynRC constructor.
@@ -32,8 +33,7 @@ class FlynRC
      */
     public function get_options(array $overrides = [])
     {
-        if ( empty($options) )
-        {
+        if (empty($options)) {
             $default_options = apply_filters('flynrc_get_options', [
                 'site_key' => defined('FLYNRC_SITE_KEY') ? FLYNRC_SITE_KEY : '',
                 'secret_key' => defined('FLYNRC_SECRET_KEY') ? FLYNRC_SECRET_KEY : '',
@@ -52,14 +52,14 @@ class FlynRC
      */
     public function get_recaptcha()
     {
-        require_once __DIR__.'/vendor/autoload.php';
+        require_once __DIR__ . '/vendor/autoload.php';
 
         return new \ReCaptcha\ReCaptcha($this->options['secret_key']);
     }
 
     public function reload()
     {
-        require __DIR__.'/views/script.js.php';
+        require __DIR__ . '/views/script.js.php';
     }
 
     /**
@@ -87,9 +87,10 @@ class FlynRC
         $located = locate_template('plugins/flyn-recaptcha/frontend.php');
         $recaptcha = $this->get_recaptcha();
 
-        if ( $located )
+        if ($located) {
             require $located;
-        else
-            require __DIR__.'/views/frontend.php';
+        } else {
+            require __DIR__ . '/views/frontend.php';
+        }
     }
 }
