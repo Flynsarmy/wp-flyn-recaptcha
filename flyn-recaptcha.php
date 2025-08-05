@@ -14,50 +14,67 @@
 class FlynRC
 {
     public string $id = '';
-    protected array $options = [];
+
+    /**
+     * @var array{
+     *  site_key: string,
+     *  secret_key: string,
+     *  action: string,
+     * }
+     */
+    protected array $options = [
+        'site_key' => defined('FLYNRC_SITE_KEY') ? FLYNRC_SITE_KEY : '',
+        'secret_key' => defined('FLYNRC_SECRET_KEY') ? FLYNRC_SECRET_KEY : '',
+        'action' => 'default',
+    ];
 
     /**
      * FlynRC constructor.
-     * @param $id
-     * @param array $options
+     * @param string $id
+     * @param array{
+     *  site_key?: string,
+     *  secret_key?: string,
+     *  action?: string,
+     * } $options
      */
-    public function __construct($id, array $options = [])
+    public function __construct(string $id, array $options = [])
     {
         $this->id = 'g-recaptcha-3-' . $id;
         $this->options = $this->get_options($options);
     }
 
     /**
-     * @param array $overrides
-     * @return array
+     * @param array{
+     *  site_key?: string,
+     *  secret_key?: string,
+     *  action?: string,
+     * } $overrides
+     * @return array{
+     *  site_key: string,
+     *  secret_key: string,
+     *  action: string,
+     * }
      */
     public function get_options(array $overrides = [])
     {
-        if (empty($options)) {
-            $default_options = apply_filters('flynrc_get_options', [
-                'site_key' => defined('FLYNRC_SITE_KEY') ? FLYNRC_SITE_KEY : '',
-                'secret_key' => defined('FLYNRC_SECRET_KEY') ? FLYNRC_SECRET_KEY : '',
-                'action' => 'default',
-            ]);
+        $options = apply_filters('flynrc_get_options', $this->options);
+        $options = array_merge($options, $overrides);
 
-            $options = array_merge($default_options, $overrides);
-        }
-
-        return $options;
+        return [
+            'site_key' => $options['site_key'] ?? '',
+            'secret_key' => $options['secret_key'] ?? '',
+            'action' => $options['action'] ?? 'default',
+        ];
     }
 
-    /**
-     * @param array $options
-     * @return \ReCaptcha\ReCaptcha
-     */
-    public function get_recaptcha()
+    public function get_recaptcha(): \ReCaptcha\ReCaptcha
     {
         require_once __DIR__ . '/vendor/autoload.php';
 
         return new \ReCaptcha\ReCaptcha($this->options['secret_key']);
     }
 
-    public function reload()
+    public function reload(): void
     {
         require __DIR__ . '/views/script.js.php';
     }
@@ -66,11 +83,11 @@ class FlynRC
      * Calls the reCAPTCHA siteverify API to verify whether the user passes
      * CAPTCHA test.
      *
-     * @param array $post     POST data submitted by the form
-     * @param null $remoteIp  The end user's IP address.
+     * @param array<mixed> $post     POST data submitted by the form
+     * @param null|string $remoteIp  The end user's IP address.
      * @return \ReCaptcha\Response Response from the service.
      */
-    public function verify(array $post, $remoteIp = null)
+    public function verify(array $post, null|string $remoteIp = null): \ReCaptcha\Response
     {
         return $this->get_recaptcha()
             ->setExpectedAction(@$post['g-recaptcha-3-action'])
@@ -80,9 +97,8 @@ class FlynRC
     /**
      * Renders a ReCaptcha captcha on the page.
      * Uses $themedir/plugins/flynsarmy-recaptcha/frontend.php if available
-     * @param array $overrides
      */
-    public function render(array $overrides = [])
+    public function render(): void
     {
         $located = locate_template('plugins/flyn-recaptcha/frontend.php');
         $recaptcha = $this->get_recaptcha();
