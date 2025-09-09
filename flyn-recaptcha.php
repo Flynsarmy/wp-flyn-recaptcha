@@ -14,56 +14,48 @@
 class FlynRC
 {
     public string $id = '';
+    public string $action = 'default';
 
     /**
      * @var array{
      *  site_key: string,
-     *  secret_key: string,
-     *  action: string,
+     *  secret_key: string
      * }
      */
     protected array $options = [
-        'site_key' => defined('FLYNRC_SITE_KEY') ? FLYNRC_SITE_KEY : '',
-        'secret_key' => defined('FLYNRC_SECRET_KEY') ? FLYNRC_SECRET_KEY : '',
-        'action' => 'default',
+        'site_key' => '',
+        'secret_key' => '',
     ];
 
     /**
      * FlynRC constructor.
      * @param string $id
-     * @param array{
-     *  site_key?: string,
-     *  secret_key?: string,
-     *  action?: string,
-     * } $options
+     * @param string $action
      */
-    public function __construct(string $id, array $options = [])
+    public function __construct(string $id, string $action = 'default')
     {
         $this->id = 'g-recaptcha-3-' . $id;
-        $this->options = $this->get_options($options);
+        $this->action = $action;
+
+        $this->options = [
+            'site_key' => defined('FLYNRC_SITE_KEY') ? FLYNRC_SITE_KEY : '',
+            'secret_key' => defined('FLYNRC_SECRET_KEY') ? FLYNRC_SECRET_KEY : '',
+        ];
     }
 
     /**
-     * @param array{
-     *  site_key?: string,
-     *  secret_key?: string,
-     *  action?: string,
-     * } $overrides
      * @return array{
      *  site_key: string,
-     *  secret_key: string,
-     *  action: string,
+     *  secret_key: string
      * }
      */
-    public function get_options(array $overrides = [])
+    public function get_options(): array
     {
         $options = apply_filters('flynrc_get_options', $this->options);
-        $options = array_merge($options, $overrides);
 
         return [
             'site_key' => $options['site_key'] ?? '',
             'secret_key' => $options['secret_key'] ?? '',
-            'action' => $options['action'] ?? 'default',
         ];
     }
 
