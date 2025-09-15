@@ -66,11 +66,6 @@ class FlynRC
         return new \ReCaptcha\ReCaptcha($this->options['secret_key']);
     }
 
-    public function reload(): void
-    {
-        require __DIR__ . '/views/script.js.php';
-    }
-
     /**
      * Calls the reCAPTCHA siteverify API to verify whether the user passes
      * CAPTCHA test.
