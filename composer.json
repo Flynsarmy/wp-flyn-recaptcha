@@ -1,5 +1,5 @@
 {
-    "name": "flynsarmy/wp-flyn-recaptcha-plugin",
+    "name": "flynsarmy/flyn-recaptcha",
     "description": "Adds recaptcha support to your site",
     "type": "wordpress-plugin",
     "license": "MIT",
