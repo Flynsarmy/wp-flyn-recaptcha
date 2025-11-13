@@ -61,7 +61,9 @@ class FlynRC
 
     public function get_recaptcha(): \ReCaptcha\ReCaptcha
     {
-        require_once __DIR__ . '/vendor/autoload.php';
+        if (!class_exists('ReCaptcha\\ReCaptcha')) {
+            require_once __DIR__ . '/vendor/autoload.php';
+        }
 
         return new \ReCaptcha\ReCaptcha($this->options['secret_key']);
     }
